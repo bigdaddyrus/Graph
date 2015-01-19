@@ -1,0 +1,162 @@
+package graph;
+
+import org.junit.Test;
+import java.util.ArrayList;
+
+import java.util.Arrays;
+import static org.junit.Assert.*;
+
+/** Unit tests for the traversal class.
+ *  @author Ruhao Xia
+ */
+public class TraversalTesting {
+
+    private class DFTrav extends DepthFirstTraversal {
+
+        private ArrayList<ArrayList<Integer>> results =
+            new ArrayList<ArrayList<Integer>>();
+        private ArrayList<Integer> result = new ArrayList<>();
+
+        protected DFTrav(Graph G) {
+            super(G);
+            ArrayList<Integer> a =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 4, 1, 3, 2));
+            ArrayList<Integer> b =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 3, 2, 4, 1));
+            results.add(a);
+            results.add(b);
+        }
+
+
+        @Override
+        protected boolean visit(int v) {
+            result.add(v);
+            return super.visit(v);
+        }
+        public boolean isCorrect(int start) {
+            traverse(start);
+            return results.contains(result);
+        }
+
+        public ArrayList<Integer> getRes(int start) {
+            traverse(start);
+            return result;
+        }
+
+        @Override
+        protected boolean shouldPostVisit(int v) {
+            return false;
+        }
+    }
+
+    private class PDFTrav extends DepthFirstTraversal {
+        private ArrayList<ArrayList<Integer>> results =
+            new ArrayList<ArrayList<Integer>>();
+        private ArrayList<Integer> result = new ArrayList<>();
+
+        protected PDFTrav(Graph G) {
+            super(G);
+            ArrayList<Integer> a =
+                new ArrayList<Integer>(Arrays.<Integer>asList(1, 4, 2, 3, 5));
+            ArrayList<Integer> b =
+                new ArrayList<Integer>(Arrays.<Integer>asList(2, 3, 1, 4, 5));
+            results.add(a);
+            results.add(b);
+        }
+
+        public ArrayList<Integer> getRes(int start) {
+            traverse(start);
+            return result;
+        }
+
+        @Override
+        protected boolean postVisit(int v) {
+            result.add(v);
+            return super.postVisit(v);
+        }
+
+        public boolean isCorrect(int start) {
+            traverse(start);
+            return results.contains(result);
+        }
+    }
+
+    private class BFTrav extends BreadthFirstTraversal {
+        private ArrayList<ArrayList<Integer>> results =
+            new ArrayList<ArrayList<Integer>>();
+        private ArrayList<Integer> result = new ArrayList<>();
+
+        protected BFTrav(Graph G) {
+            super(G);
+            ArrayList<Integer> a =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 4, 3, 1, 2));
+            ArrayList<Integer> b =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 3, 4, 1, 2));
+            ArrayList<Integer> c =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 4, 3, 2, 1));
+            ArrayList<Integer> d =
+                new ArrayList<Integer>(Arrays.<Integer>asList(5, 3, 4, 2, 1));
+            results.add(a);
+            results.add(b);
+            results.add(c);
+            results.add(d);
+        }
+        @Override
+        protected boolean visit(int v) {
+            result.add(v);
+            return super.visit(v);
+        }
+
+        public boolean isCorrect(int start) {
+            traverse(start);
+            return results.contains(result);
+        }
+        public ArrayList<Integer> getRes(int start) {
+            traverse(start);
+            return result;
+        }
+    }
+
+    @Test
+    public void testTraversal() {
+        DirectedGraph g = new DirectedGraph();
+        g.add();
+        g.add();
+        g.add();
+        g.add();
+        g.add();
+        g.add(5, 4);
+        g.add(5, 3);
+        g.add(4, 1);
+        g.add(3, 2);
+        g.add(1, 5);
+        DFTrav trav = new DFTrav(g);
+        assertEquals("DepthFirstTraversal", true, trav.isCorrect(5));
+        BFTrav trav3 = new BFTrav(g);
+        assertEquals("BreadthFirstTraversal", true, trav3.isCorrect(5));
+        PDFTrav trav2 = new PDFTrav(g);
+        assertEquals("postVisit DepthFirstTraversal", true, trav2.isCorrect(5));
+    }
+
+    @Test
+    public void autoUTest() {
+        UndirectedGraph a = new UndirectedGraph();
+        for (int i = 0; i < 10; i++) {
+            a.add();
+        }
+        a.add(1, 2);
+        a.add(1, 3);
+        a.add(1, 4);
+        a.add(2, 5);
+        a.add(2, 3);
+        a.add(2, 6);
+        a.add(3, 7);
+        a.add(3, 8);
+        a.add(8, 1);
+        a.add(8, 9);
+        a.add(8, 10);
+        a.add(10, 7);
+        a.add(8, 8);
+        PDFTrav trav4 = new PDFTrav(a);
+    }
+}

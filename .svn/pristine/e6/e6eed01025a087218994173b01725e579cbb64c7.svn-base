@@ -1,0 +1,127 @@
+package graph;
+
+import org.junit.Test;
+import java.util.List;
+import java.util.ArrayList;
+
+import java.util.Arrays;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.*;
+import java.util.Iterator;
+import java.util.Collection;
+
+/** Unit tests for the traversal class.
+ *  @author Ruhao Xia
+ */
+public class PathsTesting {
+
+	private class SimpleTest extends SimpleShortestPaths {
+
+		
+		private LabeledGraph<Double, Double> g;
+
+		protected SimpleTest(LabeledGraph<Double, Double> G, int start, int dest) {
+			super(G, start, dest);
+			// ArrayList<Integer> a =
+			// new ArrayList<Integer>(Arrays.<Integer>asList(5, 4, 1, 3, 2));
+			// ArrayList<Integer> b =
+			// new ArrayList<Integer>(Arrays.<Integer>asList(5, 3, 2, 4, 1));
+			// results.add(a);
+			// results.add(b);
+			g = G;
+
+		}
+
+		@Override
+		protected double getWeight(int u, int v) {
+            // REPLACE WITH SOLUTION
+            return g.getLabel(u, v);
+        }
+
+        @Override
+        protected double estimatedDistance(int v) {
+        	return g.getLabel(v);
+        }
+	}
+
+	@Test
+	public void basicsSP() {
+		Graph G = new DirectedGraph();
+        LabeledGraph<Double, Double> g = new LabeledGraph<Double, Double>(G);
+        	g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.remove(1);
+	        g.add(4, 2);
+			g.add(2, 3);
+			g.add(4, 3);
+			g.add(4, 5);
+			g.add(5, 6);
+			g.add(5, 3);
+			g.setLabel(4, 102.0);
+			g.setLabel(2, 4.0);
+			g.setLabel(3, 0.0);
+			g.setLabel(5, 5.1);
+			g.setLabel(6, 40.0);
+
+			g.setLabel(4, 2, 12.2);
+			g.setLabel(4, 5, 11.2);
+			g.setLabel(2, 3, 6.5);
+			g.setLabel(4, 3, 102.0);
+			g.setLabel(5, 6, 30.0);
+			g.setLabel(5, 3, 9.1);
+			SimpleTest st = new SimpleTest(g, 4, 3);
+			st.setPaths();
+			assertEquals("Get ED", 0.0, 102.0, st.estimatedDistance(4));
+			assertEquals("Get Weight edge", 0.0,  12.2, st.getWeight(4, 2));
+			st.setWeight(3, 3.0);
+			assertEquals("Get Weight v", 0.0,  3.0, st.getWeight(3));
+			st.setPredecessor(4, 5);
+			assertEquals("get Predecessor", 5, st.getPredecessor(4));
+			assertEquals("get source", 4, st.getSource());
+			assertEquals("get dest", 3, st.getDest());
+	}
+
+    @Test
+    public void testShortestPath() {
+    	ArrayList<Integer> result = new ArrayList<>();
+    	Graph G = new DirectedGraph();
+        LabeledGraph<Double, Double> g = new LabeledGraph<Double, Double>(G);
+        	g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.add();
+	        g.remove(1);
+	        g.add(4, 2);
+			g.add(2, 3);
+			g.add(4, 3);
+			g.add(4, 5);
+			g.add(5, 6);
+			g.add(5, 3);
+			g.setLabel(4, 102.0);
+			g.setLabel(2, 4.0);
+			g.setLabel(3, 0.0);
+			g.setLabel(5, 5.1);
+			g.setLabel(6, 40.0);
+
+			g.setLabel(4, 2, 12.2);
+			g.setLabel(4, 5, 11.2);
+			g.setLabel(2, 3, 6.5);
+			g.setLabel(4, 3, 102.0);
+			g.setLabel(5, 6, 30.0);
+			g.setLabel(5, 3, 9.1);
+			SimpleTest st = new SimpleTest(g, 4, 3);
+			st.setPaths();
+			assertEquals("get Paths", Arrays.<Integer>asList(4, 2, 3), st.pathTo());
+			assertEquals("visit 5?", 4, st.getPredecessor(5));
+			assertFalse(5 == st.getPredecessor(6));
+	
+
+    }
+
+}

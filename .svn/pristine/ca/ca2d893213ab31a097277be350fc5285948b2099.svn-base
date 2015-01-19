@@ -1,0 +1,284 @@
+package graph;
+
+
+/* See restrictions in Graph.java. */
+
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/** A partial implementation of Graph containing elements common to
+ *  directed and undirected graphs.
+ *
+ *  @author Ruhao Xia
+ */
+abstract class GraphObj extends Graph {
+
+    /** A new, empty Graph. */
+    GraphObj() {
+        _graph = new HashMap<Integer, Node>();
+    }
+
+    @Override
+    public int vertexSize() {
+        return _graph.size();
+    }
+
+    @Override
+    public int maxVertex() {
+        int max = 0;
+        for (int e: vertices()) {
+            if (e > max) {
+                max = e;
+            }
+        }
+        return max;
+    }
+
+    @Override
+    public int edgeSize() {
+        int total = 0;
+        Collection<Node> values = _graph.values();
+        for (Node e: values) {
+            total += e.getSucc().size();
+        }
+        if (!isDirected()) {
+            total = total / 2;
+        }
+        return total;
+    }
+
+    @Override
+    public abstract boolean isDirected();
+
+    @Override
+    public int outDegree(int v) {
+        return _graph.get(v).getSucc().size();
+    }
+
+    @Override
+    public abstract int inDegree(int v);
+
+    @Override
+    public boolean contains(int u) {
+        return _graph.containsKey(u);
+    }
+
+    @Override
+    public boolean contains(int u, int v) {
+        if (contains(u) && contains(v)) {
+            ArrayList<Integer> succ = _graph.get(u).getSucc();
+            return succ.contains(v);
+        }
+        return false;
+    }
+
+    @Override
+    public int add() {
+        int i;
+        for (i = 1; _graph.get(i) != null;) {
+            i++;
+        }
+        _graph.put(i, new Node());
+        return i;
+    }
+
+    @Override
+    public int add(int u, int v) {
+        if (contains(u, v)) {
+            return u;
+        }
+        if (isDirected()) {
+            _graph.get(u).addSucc(v);
+            _graph.get(v).addPred(u);
+        } else {
+            _graph.get(u).addSucc(v);
+            _graph.get(u).addPred(v);
+            _graph.get(v).addSucc(u);
+            _graph.get(v).addPred(u);
+        }
+        return u;
+    }
+
+    @Override
+    public void remove(int v) {
+        if (contains(v)) {
+            if (isDirected()) {
+                for (int e: predecessors(v)) {
+                    removeHelper(_graph.get(e).getSucc(), v);
+                }
+                for (int e: successors(v)) {
+                    removeHelper(_graph.get(e).getPred(), v);
+                }
+                _graph.remove(v);
+            } else {
+                for (int e: successors(v)) {
+                    removeHelper(_graph.get(e).getPred(), v);
+                    removeHelper(_graph.get(e).getSucc(), v);
+                }
+                _graph.remove(v);
+            }
+        }
+    }
+
+    @Override
+    public void remove(int u, int v) {
+        if (contains(u, v)) {
+            ArrayList<Integer> uSucc = _graph.get(u).getSucc();
+            ArrayList<Integer> uPred = _graph.get(u).getPred();
+            ArrayList<Integer> vSucc = _graph.get(v).getSucc();
+            ArrayList<Integer> vPred = _graph.get(v).getPred();
+            if (isDirected()) {
+                removeHelper(uSucc, v);
+                removeHelper(vPred, u);
+            } else {
+                removeHelper(uSucc, v);
+                removeHelper(vSucc, u);
+                removeHelper(uPred, v);
+                removeHelper(vPred, u);
+            }
+        }
+    }
+
+    /** A helper function that elinmate V in L and adjust the indexes. */
+    private void removeHelper(ArrayList<Integer> L, int v) {
+        int index = 0;
+        for (int e: L) {
+            if (e == v) {
+                L.remove(index);
+                break;
+            }
+            index++;
+        }
+    }
+    @Override
+    public Iteration<Integer> vertices() {
+        int key;
+        ArrayList<Integer> vert = new ArrayList<>();
+        int size = _graph.size();
+        for (key = 1; key <= size; key++) {
+            if (_graph.get(key) != null) {
+                vert.add(key);
+            } else {
+                size++;
+            }
+        }
+        return Iteration.iteration(vert);
+    }
+
+    @Override
+    public int successor(int v, int k) {
+        if (contains(v)) {
+            ArrayList<Integer> succ = _graph.get(v).getSucc();
+            int size = succ.size();
+            if (k < size) {
+                return succ.get(k);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public abstract int predecessor(int v, int k);
+
+    @Override
+    public Iteration<Integer> successors(int v) {
+        if (contains(v)) {
+            ArrayList<Integer> succ = _graph.get(v).getSucc();
+            return Iteration.iteration(succ);
+        }
+        return null;
+    }
+
+    @Override
+    public abstract Iteration<Integer> predecessors(int v);
+
+    @Override
+    public Iteration<int[]> edges() {
+        ArrayList<int[]> edges = new ArrayList<>();
+        if (isDirected()) {
+            for (int index: vertices()) {
+                for (int e: successors(index)) {
+                    int[] edge = {index, e};
+                    edges.add(edge);
+                }
+            }
+        } else {
+            for (int index: vertices()) {
+                for (int e: successors(index)) {
+                    if (e > index) {
+                        int[] edge = {index, e};
+                        edges.add(edge);
+                    }
+                }
+            }
+        }
+        return Iteration.iteration(edges);
+    }
+
+    @Override
+    protected boolean mine(int v) {
+        return _graph.containsKey(v);
+    }
+
+    @Override
+    protected void checkMyVertex(int v) {
+        if (!mine(v)) {
+            throw new Error("No Vertex Exists");
+        }
+    }
+
+    @Override
+    protected int edgeId(int u, int v) {
+        if (isDirected()) {
+            return (u + v) * (u + v + 1) / 2 + v;
+        } else {
+            int m = Math.max(u, v);
+            int n = Math.min(u, v);
+            return (m + n) * (m + n + 1) / 2 + n;
+        }
+    }
+
+    /** Get the Graph return _graph. */
+    protected HashMap<Integer, Node> getGraph() {
+        return _graph;
+    }
+
+
+    /** A class that represents a Node in the Graph. */
+    protected static class Node {
+        /** A list that represents predecessor in the Node. */
+        private ArrayList<Integer> pred;
+        /** A list that represents successor in the Node. */
+        private ArrayList<Integer> succ;
+
+        /** Return a Empty Node. */
+        public Node() {
+            pred = new ArrayList<Integer>();
+            succ = new ArrayList<Integer>();
+        }
+
+        /** Add Predecessor to V. */
+        public void addPred(int v) {
+            pred.add(v);
+        }
+
+        /** Add Successor to U. */
+        public void addSucc(int u) {
+            succ.add(u);
+        }
+
+        /** Return Predecessors of me. */
+        public ArrayList<Integer> getPred() {
+            return pred;
+        }
+
+        /** Return Successors of me. */
+        public ArrayList<Integer> getSucc() {
+            return succ;
+        }
+    }
+
+    /** The field that represnets a graph. */
+    private HashMap<Integer, Node> _graph;
+}

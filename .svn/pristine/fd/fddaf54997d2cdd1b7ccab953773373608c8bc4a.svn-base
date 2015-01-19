@@ -1,0 +1,49 @@
+package graph;
+import java.util.ArrayList;
+/* See restrictions in Graph.java. */
+
+/** Represents a general unlabeled directed graph whose vertices are denoted by
+ *  positive integers. Graphs may have self edges.
+ *
+ *  @author
+ */
+public class DirectedGraph extends GraphObj {
+
+    @Override
+    public boolean isDirected() {
+        return true;
+    }
+
+    @Override
+    public int inDegree(int v) {
+        // FIXME
+        return _graph.get(v).getPred().size();
+    }
+
+    @Override
+    public int predecessor(int v, int k) {
+        // FIXME
+        if (contains(v)) {
+            ArrayList<Integer> pred = _graph.get(v).getPred();
+            int size = pred.size();
+            if (k < size) {
+                return pred.get(k);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public Iteration<Integer> predecessors(int v) {
+        // FIXME
+        if (contains(v)) {
+            ArrayList<Integer> pred = _graph.get(v).getPred();
+            return Iteration.iteration(pred);
+        }
+        return null;
+    }
+
+    // FIXME
+    // private HashMap<Integer, Node> _graph;
+
+}

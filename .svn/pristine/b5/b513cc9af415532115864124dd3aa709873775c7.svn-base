@@ -1,0 +1,20 @@
+package graph;
+
+import org.junit.Test;
+import java.util.Arrays;
+import static org.junit.Assert.*;
+
+/** Unit tests for the Graph class.
+ *  @author
+ */
+public class TraversalTesting {
+
+    // Add tests.  Here's a sample.
+
+    @Test
+    public void testTraversal() {
+        DirectedGraph g = new DirectedGraph();
+        
+    }
+
+}

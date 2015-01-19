@@ -1,0 +1,148 @@
+package graph;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/** Unit tests for the Graph class.
+ *  @author Ruhao Xia
+ */
+public class GraphTesting {
+
+    @Test
+    public void emptyGraph() {
+        DirectedGraph g = new DirectedGraph();
+        assertEquals("Initial graph has vertices", 0, g.vertexSize());
+        assertEquals("Initial graph has edges", 0, g.edgeSize());
+    }
+
+    @Test
+    public void sampleDTest() {
+        DirectedGraph g = new DirectedGraph();
+        g.add();
+        g.add();
+        g.add();
+        g.add(1, 3);
+        g.add(3, 2);
+        g.add(2, 1);
+        g.add(2, 3);
+        assertEquals("Size of the graph", 3, g.vertexSize());
+        assertEquals("Edges of the graph", 4, g.edgeSize());
+        g.add();
+        g.remove(2, 1);
+        assertEquals("Edges of the graph after removing edge", 3, g.edgeSize());
+        assertEquals("Successor of 2 at 0", 3, g.successor(2, 0));
+        g.remove(2);
+        assertEquals("Contains Vertex", false, g.contains(2));
+        assertEquals("Max Vertex", 4, g.maxVertex());
+        assertEquals("Size of the graph after removing vertice",
+                        3, g.vertexSize());
+        g.add(1, 4);
+        assertEquals("Contains edge", true, g.contains(1, 4));
+        assertEquals("Indegree", 0, g.inDegree(1));
+        assertEquals("Outdegree", 2, g.outDegree(1));
+        g.add();
+        assertEquals("Predecessor of new 2 at 0", 0, g.predecessor(2, 0));
+        g.add(1, 1);
+        g.add(1, 2);
+        g.add(1, 2);
+        g.add(2, 2);
+    }
+
+    @Test
+    public void sampleUTest() {
+        UndirectedGraph g = new UndirectedGraph();
+        g.add();
+        g.add();
+        g.add();
+        g.add(1, 3);
+        g.add(3, 2);
+        g.add(2, 1);
+        assertEquals("Size of the graph", 3, g.vertexSize());
+        assertEquals("Edges of the graph", 3, g.edgeSize());
+        g.add();
+        g.remove(2, 1);
+        assertEquals("Edges of the graph after removing edge", 2, g.edgeSize());
+        assertEquals("Successor of 2 at 0", 3, g.successor(2, 0));
+        g.remove(2);
+        assertEquals("Contains Vertex", false, g.contains(2));
+        g.add(1, 4);
+        assertEquals("Contains edge", true, g.contains(1, 4));
+        assertEquals("Contains edge reverse", true, g.contains(4, 1));
+        assertEquals("Indegree", 2, g.inDegree(1));
+        g.add();
+        assertEquals("Predecessor of new 2 at 0", 0, g.predecessor(2, 0));
+    }
+
+    @Test
+    public void autoUTest() {
+        UndirectedGraph a = new UndirectedGraph();
+        for (int i = 0; i < 10; i++) {
+            a.add();
+        }
+        a.add(1, 2);
+        a.add(1, 3);
+        a.add(1, 4);
+        a.add(2, 5);
+        a.add(2, 3);
+        a.add(2, 6);
+        a.add(3, 7);
+        a.add(3, 8);
+        a.add(8, 1);
+        a.add(8, 9);
+        a.add(8, 10);
+        a.add(10, 7);
+        a.add(8, 8);
+        ArrayList<Integer> res = new ArrayList<>();
+        for (int e: a.successors(8)) {
+            res.add(e);
+        }
+        assertEquals(
+            new ArrayList<Integer>(Arrays.<Integer>asList(3, 1, 9, 10, 8)),
+            res);
+    }
+
+    @Test
+    public void edgeTest() {
+        UndirectedGraph a = new UndirectedGraph();
+        for (int i = 0; i < 10; i++) {
+            a.add();
+        }
+        a.remove(5);
+        a.remove(6);
+        a.add(2, 1);
+        a.add(2, 2);
+        a.add(1, 1);
+        a.add(8, 10);
+        a.add(1, 8);
+        a.add(1, 4);
+        a.add(2, 3);
+        a.add(3, 7);
+        a.add(8, 8);
+        a.add(7, 10);
+        a.add(3, 8);
+        a.add(1, 3);
+        a.add(8, 9);
+        assertTrue(a.contains(2, 2));
+    }
+
+    @Test
+    public void undirectedselfEdgeTest() {
+        UndirectedGraph g = new UndirectedGraph();
+        g.add();
+        g.add();
+        g.add();
+        g.add(1, 3);
+        g.add(3, 2);
+        g.add(2, 1);
+        g.add(1, 1);
+        assertEquals(4, g.edgeSize());
+        g.add(1, 1);
+        assertEquals(4, g.edgeSize());
+        g.add(3, 3);
+        assertEquals(5, g.edgeSize());
+        g.add(2, 2);
+        assertEquals(6, g.edgeSize());
+    }
+}
